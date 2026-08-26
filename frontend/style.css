@@ -1,0 +1,260 @@
+/* ---------- RESET & BASE ---------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: #f5f7fa;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem;
+}
+
+/* ---------- LANGUE ---------- */
+.lang-switch {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 100;
+}
+
+.lang-icon-btn {
+  background: white;
+  border: 1px solid #d0d7de;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.lang-icon-btn:hover {
+  background: #f0f2f5;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.lang-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: white;
+  border: 1px solid #d0d7de;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 0.5rem 0;
+  min-width: 140px;
+  list-style: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+}
+.lang-menu.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.lang-menu li button {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1.2rem;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: #1f2937;
+  transition: background 0.15s;
+}
+.lang-menu li button:hover {
+  background: #f0f2f5;
+}
+.lang-menu li button.active {
+  font-weight: 600;
+  color: #0d6efd;
+  background: #e8f0fe;
+}
+
+/* ---------- CARD ---------- */
+.card {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+  padding: 2.5rem 2rem 2rem;
+  max-width: 420px;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.brand {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.mark {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e8edf2;
+  margin-bottom: 0.75rem;
+}
+.brand h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #0b1a33;
+  letter-spacing: -0.5px;
+}
+.brand p {
+  color: #6b7a8f;
+  font-size: 0.95rem;
+  margin-top: 0.25rem;
+}
+
+/* ---------- FORMULAIRE ---------- */
+.field {
+  margin-bottom: 1.25rem;
+}
+.field label {
+  display: block;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #1f2937;
+  margin-bottom: 0.3rem;
+}
+.field input {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border: 1.5px solid #d0d7de;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #fafbfc;
+}
+.field input:focus {
+  outline: none;
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13,110,253,0.15);
+}
+.field.invalid input {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220,53,69,0.12);
+}
+.field-error {
+  font-size: 0.8rem;
+  color: #dc3545;
+  margin-top: 0.3rem;
+  display: none;
+}
+.field.invalid .field-error {
+  display: block;
+}
+
+/* ---------- PASSWORD WRAPPER (œil) ---------- */
+.password-wrapper {
+  position: relative;
+}
+.password-wrapper input {
+  padding-right: 3rem;
+}
+.toggle-password {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem;
+  color: #6b7a8f;
+  transition: color 0.2s;
+}
+.toggle-password:hover {
+  color: #0b1a33;
+}
+.toggle-password svg {
+  display: block;
+}
+
+/* ---------- BOUTONS ---------- */
+.submit-btn {
+  width: 100%;
+  padding: 0.8rem;
+  background: #0b1a33;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  margin-top: 0.5rem;
+}
+.submit-btn:hover {
+  background: #142c4a;
+}
+.submit-btn:active {
+  transform: scale(0.98);
+}
+
+.status-msg {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  display: none;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+.divider {
+  text-align: center;
+  margin: 1.8rem 0 1.2rem;
+  font-size: 0.85rem;
+  color: #9aa6b5;
+  position: relative;
+}
+.divider::before,
+.divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 30%;
+  height: 1px;
+  background: #d0d7de;
+}
+.divider::before { left: 0; }
+.divider::after { right: 0; }
+
+.account-btn {
+  width: 100%;
+  padding: 0.7rem;
+  background: transparent;
+  border: 1.5px solid #d0d7de;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #1f2937;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.account-btn:hover {
+  background: #f0f2f5;
+  border-color: #b0b8c4;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 480px) {
+  .card { padding: 1.8rem 1.2rem; }
+  .lang-switch { top: 1rem; right: 1rem; }
+}

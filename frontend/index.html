@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JugurtaDev — Login</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Sélecteur de langue -->
+  <div class="lang-switch">
+    <button type="button" class="lang-icon-btn" id="lang-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Choose language">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M3 12h18M12 3c2.5 2.5 4 5.7 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.7-4-9s1.5-6.5 4-9z"/>
+      </svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu">
+      <li><button type="button" data-lang="en" class="active">English</button></li>
+      <li><button type="button" data-lang="fr">Français</button></li>
+      <li><button type="button" data-lang="ar">العربية</button></li>
+    </ul>
+  </div>
+
+  <!-- Carte de connexion -->
+  <div class="card">
+    <div class="brand">
+      <img class="mark" src="photo.jpg" alt="Profile photo" />
+      <h1 data-i18n="title">JugurtaDev</h1>
+      <p data-i18n="subtitle">Sign in to your account</p>
+    </div>
+
+    <form id="login-form" novalidate>
+      <!-- Champ Email -->
+      <div class="field" id="field-email">
+        <label for="email" data-i18n="emailLabel">Email address</label>
+        <input type="email" id="email" name="email" autocomplete="email" placeholder="name@example.com" />
+        <div class="field-error" data-i18n="emailError">Enter a valid email address.</div>
+      </div>
+
+      <!-- Champ Mot de passe avec œil -->
+      <div class="field" id="field-password">
+        <label for="password" data-i18n="passwordLabel">Password</label>
+        <div class="password-wrapper">
+          <input type="password" id="password" name="password" autocomplete="current-password" placeholder="" />
+          <button type="button" class="toggle-password" aria-label="Show password" tabindex="-1">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </button>
+        </div>
+        <div class="field-error" data-i18n="passwordError">Password must be at least 6 characters.</div>
+      </div>
+
+      <button type="submit" class="submit-btn" data-i18n="loginBtn">Sign in</button>
+      <div class="status-msg" id="status-msg"></div>
+    </form>
+
+    <div class="divider" data-i18n="orDivider">or</div>
+    <button type="button" class="account-btn" id="account-btn" data-i18n="accountBtn">Create / manage account</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

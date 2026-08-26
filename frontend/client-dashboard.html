@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head><title>Client Dashboard</title></head>
+<body>
+  <h1>Tableau de bord client</h1>
+  <p>Langue: <span id="lang-display"></span></p>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    document.getElementById('lang-display').textContent = params.get('lang') || 'en';
+  </script>
+</body>
+</html>
