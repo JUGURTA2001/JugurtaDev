@@ -24,33 +24,42 @@ const authController = {
       // ⚠️ Ne JAMAIS logger le mot de passe en clair, même en dev.
 
       if (!email || !password) {
+        console.log('   ↳ ❌ Champs manquants');
         return res.status(400).json({ message: 'Email et mot de passe requis.' });
       }
 
       const user = await UserModel.findByEmail(email);
 
       if (!user) {
-        console.log('❌ Aucun utilisateur avec cet email.');
+        console.log('   ↳ ❌ Aucun utilisateur avec cet email.');
         return res.status(401).json({ message: 'Email ou mot de passe incorrect.' });
       }
 
       if (user.statut !== 'actif') {
-        console.log('❌ Compte non actif :', user.statut);
-        // Message volontairement identique à "incorrect" pour éviter l'énumération de comptes.
+        console.log('   ↳ ❌ Compte non actif :', user.statut);
         return res.status(401).json({ message: 'Email ou mot de passe incorrect.' });
       }
 
       const isMatch = await bcrypt.compare(password, user.mot_de_passe);
 
       if (!isMatch) {
-        console.log('❌ Mot de passe incorrect pour:', email);
+        console.log('   ↳ ❌ Mot de passe incorrect pour:', email);
         return res.status(401).json({ message: 'Email ou mot de passe incorrect.' });
       }
 
       const token = generateToken(user);
       const { mot_de_passe, ...userWithoutPassword } = user;
 
-      console.log(`✅ Connexion réussie pour ${email} (rôle: ${user.role})`);
+      // ---------- Contrôle explicite du rôle détecté ----------
+      console.log(`   ↳ ✅ Connexion réussie pour ${email}`);
+      console.log(`   ↳ 🔑 Rôle détecté en base : "${user.role}"`);
+
+      // Seuls 2 rôles gèrent une interface distincte : admin et client.
+      const interfaceMap = {
+        admin: 'admin-dashboard.html',
+        client: 'profile.html',
+      };
+      console.log(`   ↳ 🖥️  Interface qui sera affichée côté frontend : ${interfaceMap[user.role] || 'profile.html'}`);
 
       res.status(200).json({
         message: 'Connexion réussie',
@@ -66,7 +75,7 @@ const authController = {
   // ---------- INSCRIPTION ----------
   register: async (req, res) => {
     try {
-      const { nom, prenom, email, password, role, telephone } = req.body;
+      const { nom, prenom, email, password, telephone } = req.body;
 
       console.log('🔹 Tentative d\'inscription pour:', email);
 
@@ -78,30 +87,24 @@ const authController = {
         return res.status(400).json({ message: 'Le mot de passe doit contenir au moins 6 caractères.' });
       }
 
-      const rolesAutorises = ['client', 'freelance'];
-      const roleFinal = rolesAutorises.includes(role) ? role : 'client';
-      // Note: on n'accepte jamais 'admin' depuis une inscription publique.
+      // Inscription publique = toujours "client" (freelance retiré, admin jamais créé ici).
+      const roleFinal = 'client';
 
       const existant = await UserModel.findByEmail(email);
       if (existant) {
-        console.log('❌ Email déjà utilisé:', email);
+        console.log('   ↳ ❌ Email déjà utilisé:', email);
         return res.status(409).json({ message: 'Cet email est déjà utilisé.' });
       }
 
       const hash = await bcrypt.hash(password, SALT_ROUNDS);
       const newUserId = await UserModel.create({
-        nom,
-        prenom,
-        email,
-        mot_de_passe: hash,
-        role: roleFinal,
-        telephone
+        nom, prenom, email, mot_de_passe: hash, role: roleFinal, telephone
       });
 
       const user = await UserModel.findById(newUserId);
       const token = generateToken(user);
 
-      console.log(`✅ Inscription réussie pour ${email} (id: ${newUserId})`);
+      console.log(`   ↳ ✅ Inscription réussie pour ${email} (id: ${newUserId}, rôle: ${roleFinal})`);
 
       res.status(201).json({
         message: 'Inscription réussie',

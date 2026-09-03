@@ -1,28 +1,38 @@
 // backend/middleware/authMiddleware.js
-// Vérifie que le token JWT envoyé par le frontend est valide.
-// À utiliser sur toutes les routes qui doivent être protégées
-// (ex: récupérer le profil, le dashboard, etc.)
-
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-function verifyToken(req, res, next) {
-  const authHeader = req.headers.authorization; // format attendu: "Bearer <token>"
+function authMiddleware(req, res, next) {
+  const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Accès refusé. Token manquant.' });
+    console.log('   ↳ ❌ Accès refusé : aucun token fourni');
+    return res.status(401).json({ message: 'Authentification requise.' });
   }
 
   const token = authHeader.split(' ')[1];
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // { id, email, role } — disponible dans les contrôleurs suivants
+    req.user = decoded; // contient { id, email, role }
+    console.log(`   ↳ ✅ Token valide — utilisateur : ${decoded.email} | rôle détecté : ${decoded.role}`);
     next();
-  } catch (error) {
-    console.log('❌ Token invalide ou expiré');
-    return res.status(401).json({ message: 'Token invalide ou expiré.' });
+  } catch (err) {
+    console.log('   ↳ ❌ Token invalide ou expiré :', err.message);
+    return res.status(401).json({ message: 'Session invalide, reconnectez-vous.' });
   }
 }
 
-module.exports = verifyToken;
+// ---------- Contrôle optionnel : restreindre une route à certains rôles ----------
+function requireRole(...rolesAutorises) {
+  return (req, res, next) => {
+    if (!rolesAutorises.includes(req.user.role)) {
+      console.log(`   ↳ ⛔ Rôle "${req.user.role}" non autorisé pour cette route (requis : ${rolesAutorises.join(', ')})`);
+      return res.status(403).json({ message: 'Accès interdit pour ce rôle.' });
+    }
+    console.log(`   ↳ ✅ Rôle "${req.user.role}" autorisé`);
+    next();
+  };
+}
+
+module.exports = { authMiddleware, requireRole };
