@@ -69,8 +69,7 @@
         : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
     }
   }
-sendCodeBtn?.addEventListener('click', sendConfirmationCode);
-verifyCodeBtn?.addEventListener('click', verifyCode);
+
   // ---- Validation helpers ----
   function validateEmail(val) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
@@ -94,7 +93,6 @@ verifyCodeBtn?.addEventListener('click', verifyCode);
   function validateForm() {
     let isValid = true;
 
-    // Nom
     if (!lastname.value.trim()) {
       showError(lastname, lastnameError);
       isValid = false;
@@ -102,7 +100,6 @@ verifyCodeBtn?.addEventListener('click', verifyCode);
       hideError(lastname, lastnameError);
     }
 
-    // Prénom
     if (!firstname.value.trim()) {
       showError(firstname, firstnameError);
       isValid = false;
@@ -110,7 +107,6 @@ verifyCodeBtn?.addEventListener('click', verifyCode);
       hideError(firstname, firstnameError);
     }
 
-    // Email
     if (!validateEmail(email.value.trim())) {
       showError(email, emailError);
       isValid = false;
@@ -118,7 +114,6 @@ verifyCodeBtn?.addEventListener('click', verifyCode);
       hideError(email, emailError);
     }
 
-    // Mot de passe (min 6)
     if (password.value.length < 6) {
       showError(password, passwordError);
       isValid = false;
@@ -126,7 +121,6 @@ verifyCodeBtn?.addEventListener('click', verifyCode);
       hideError(password, passwordError);
     }
 
-    // Confirmation
     if (password.value !== confirmPassword.value) {
       showError(confirmPassword, confirmError);
       isValid = false;
@@ -137,159 +131,81 @@ verifyCodeBtn?.addEventListener('click', verifyCode);
     return isValid;
   }
 
-  // ---- Simulation d'envoi du code ----
- // ---- Envoi du code vers le backend ----
-async function sendConfirmationCode() {
-  if (!validateForm()) {
-    setStatus('Veuillez corriger les erreurs du formulaire.', 'error');
-    return;
-  }
+  // ---- Envoi du code vers le backend ----
+  async function sendConfirmationCode() {
+    if (!validateForm()) {
+      setStatus('Veuillez corriger les erreurs du formulaire.', 'error');
+      return;
+    }
 
-  sendCodeBtn.disabled = true;
-  setStatus('⏳ Envoi du code en cours...', 'info');
+    sendCodeBtn.disabled = true;
+    setStatus('⏳ Envoi du code en cours...', 'info');
 
-  try {
-    const response = await fetch('http://localhost:5000/api/auth/register/send-code', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.value.trim() })
-    });
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/register/send-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.value.trim() })
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (response.ok) {
-      codeSection.style.display = 'block';
-      setStatus(`✅ ${data.message} (consultez votre boîte mail)`, 'success');
-      // En test, le code est peut-être renvoyé dans data.code (si décommenté)
-      // On le stocke pour la vérification (en développement)
-      if (data.code) {
-        confirmationCodeInput.dataset.expectedCode = data.code;
+      if (response.ok) {
+        codeSection.style.display = 'block';
+        setStatus(`✅ ${data.message} (consultez votre boîte mail)`, 'success');
+        // Si le backend renvoie le code (en développement), on le stocke
+        if (data.code) {
+          confirmationCodeInput.dataset.expectedCode = data.code;
+        }
+      } else {
+        setStatus('❌ ' + data.message, 'error');
       }
-    } else {
-      setStatus('❌ ' + data.message, 'error');
+    } catch (error) {
+      setStatus('❌ Erreur réseau : ' + error.message, 'error');
+    } finally {
+      sendCodeBtn.disabled = false;
     }
-  } catch (error) {
-    setStatus('❌ Erreur réseau : ' + error.message, 'error');
-  } finally {
-    sendCodeBtn.disabled = false;
-  }
-}
-
-// ---- Vérification du code et création du compte ----
-async function verifyCode() {
-  const entered = confirmationCodeInput.value.trim();
-  if (!entered) {
-    setStatus('Veuillez entrer le code reçu par email.', 'error');
-    return;
   }
 
-  setStatus('⏳ Vérification en cours...', 'info');
-
-  try {
-    const response = await fetch('http://localhost:5000/api/auth/register/verify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: email.value.trim(),
-        code: entered,
-        lastname: lastname.value.trim(),
-        firstname: firstname.value.trim(),
-        password: password.value
-      })
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      setStatus('🎉 ' + data.message + ' Redirection vers la connexion...', 'success');
-      setTimeout(() => {
-        window.location.href = 'login.html';
-      }, 3000);
-    } else {
-      setStatus('❌ ' + data.message, 'error');
+  // ---- Vérification du code et création du compte ----
+  async function verifyCode() {
+    const entered = confirmationCodeInput.value.trim();
+    if (!entered) {
+      setStatus('Veuillez entrer le code reçu par email.', 'error');
+      return;
     }
-  } catch (error) {
-    setStatus('❌ Erreur réseau : ' + error.message, 'error');
-  }
-}
 
-  // ---- Vérification du code ----
-// ---- Envoi du code vers le backend ----
-async function sendConfirmationCode() {
-  if (!validateForm()) {
-    setStatus('Veuillez corriger les erreurs du formulaire.', 'error');
-    return;
-  }
+    setStatus('⏳ Vérification en cours...', 'info');
 
-  sendCodeBtn.disabled = true;
-  setStatus('⏳ Envoi du code en cours...', 'info');
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/register/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email.value.trim(),
+          code: entered,
+          lastname: lastname.value.trim(),
+          firstname: firstname.value.trim(),
+          password: password.value
+        })
+      });
 
-  try {
-    const response = await fetch('http://localhost:5000/api/auth/register/send-code', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.value.trim() })
-    });
+      const data = await response.json();
 
-    const data = await response.json();
-
-    if (response.ok) {
-      codeSection.style.display = 'block';
-      setStatus(`✅ ${data.message} (consultez votre boîte mail)`, 'success');
-      // En test, le code est peut-être renvoyé dans data.code (si décommenté)
-      // On le stocke pour la vérification (en développement)
-      if (data.code) {
-        confirmationCodeInput.dataset.expectedCode = data.code;
+      if (response.ok) {
+        setStatus('🎉 ' + data.message + ' Redirection vers la connexion...', 'success');
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 3000);
+      } else {
+        setStatus('❌ ' + data.message, 'error');
       }
-    } else {
-      setStatus('❌ ' + data.message, 'error');
+    } catch (error) {
+      setStatus('❌ Erreur réseau : ' + error.message, 'error');
     }
-  } catch (error) {
-    setStatus('❌ Erreur réseau : ' + error.message, 'error');
-  } finally {
-    sendCodeBtn.disabled = false;
-  }
-}
-
-// ---- Vérification du code et création du compte ----
-async function verifyCode() {
-  const entered = confirmationCodeInput.value.trim();
-  if (!entered) {
-    setStatus('Veuillez entrer le code reçu par email.', 'error');
-    return;
   }
 
-  setStatus('⏳ Vérification en cours...', 'info');
-
-  try {
-    const response = await fetch('http://localhost:5000/api/auth/register/verify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: email.value.trim(),
-        code: entered,
-        lastname: lastname.value.trim(),
-        firstname: firstname.value.trim(),
-        password: password.value
-      })
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      setStatus('🎉 ' + data.message + ' Redirection vers la connexion...', 'success');
-      setTimeout(() => {
-        window.location.href = 'login.html';
-      }, 3000);
-    } else {
-      setStatus('❌ ' + data.message, 'error');
-    }
-  } catch (error) {
-    setStatus('❌ Erreur réseau : ' + error.message, 'error');
-  }
-}
-
-  // ---- Gestion des événements en temps réel pour masquer les erreurs ----
+  // ---- Validation en temps réel ----
   function setupRealtimeValidation() {
     const fields = [
       { input: lastname, error: lastnameError },
@@ -321,25 +237,18 @@ async function verifyCode() {
     });
   }
 
-  // ---- Init ----
+  // ---- Initialisation ----
   function init() {
-    // Thème
     setTheme(getStoredTheme());
     themeToggle?.addEventListener('click', toggleTheme);
 
-    // Password toggle
     togglePassword?.addEventListener('click', togglePasswordVisibility);
 
-    // Bouton d'envoi du code
     sendCodeBtn?.addEventListener('click', sendConfirmationCode);
-
-    // Bouton de vérification du code
     verifyCodeBtn?.addEventListener('click', verifyCode);
 
-    // Validation en temps réel
     setupRealtimeValidation();
 
-    // Empêcher la soumission du formulaire (on utilise le bouton)
     form?.addEventListener('submit', (e) => e.preventDefault());
 
     console.log('✅ Register page initialisée');
